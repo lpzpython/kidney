@@ -136,21 +136,6 @@ if st.button("Train Model and Predict"):
         st.header("Prediction Result")
         # st.write(f"**Predicted Class:** {prediction}")
         st.metric(label="Predicted Probability of Acute Kidney Failure", value=f"{prediction_proba[1]:.4f}")
-        st.metric(label="Predicted Probability of No Acute Kidney Failure", value=f"{prediction_proba[0]:.4f}")
-
-        # Simple visualization
-        import matplotlib.pyplot as plt
-        fig, ax = plt.subplots()
-        classes = ['No Failure', 'Failure']
-        probs = [prediction_proba[0], prediction_proba[1]]
-        bars = ax.bar(classes, probs, color=['blue', 'red'])
-        ax.set_ylabel('Probability')
-        ax.set_title('Prediction Probabilities')
-        # Add value labels on bars
-        for bar, prob in zip(bars, probs):
-            yval = bar.get_height()
-            ax.text(bar.get_x() + bar.get_width()/2.0, yval + 0.01, f'{prob:.4f}', ha='center', va='bottom')
-        st.pyplot(fig)
 
     except Exception as e:
         st.error(f"An error occurred during model training or prediction: {e}")

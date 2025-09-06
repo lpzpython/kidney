@@ -14,7 +14,8 @@ st.set_page_config(layout="wide")
 # --- Your Provided Code (Adapted for Streamlit) ---
 
 # Load data
-df = pd.read_excel('5.19交集特征.xlsx')
+# Note: Ensure '5.19交集特征.xlsx' is in the same directory or provide the full path
+df = pd.read_excel('5.19交集特征.xlsx') 
 
 # Define variables
 continuous_vars = [
@@ -62,7 +63,8 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 
 # --- Streamlit App Interface ---
 
-st.title("Acute Kidney Failure Prediction")
+# Centered Title
+st.markdown("<h1 style='text-align: center;'>Support Vector Machine model for predicting ARDS patients with Late acute AKI</h1>", unsafe_allow_html=True)
 
 # --- 1. User Input for X values (Unified, 4 columns) ---
 st.header("1. Enter Patient Data")
@@ -139,6 +141,26 @@ if st.button("Train Model and Predict"):
 
     except Exception as e:
         st.error(f"An error occurred during model training or prediction: {e}")
+
+
+# --- Disclaimer Section at the Bottom ---
+st.markdown("---") # Horizontal line separator
+disclaimer_text = """
+**Disclaimer:**
+
+*   **Supplement:** D1 and D2 represent the first day and the second day after ARDS diagnosis, respectively.
+*   APACHE II and FIO₂ were recorded on the first day after ARDS diagnosis.
+*   Change of white blood cell count was calculated as the difference between the count on D2 and D1.
+*   48-hour fluid balance represents the total intake and output volume during the 2 days after ARDS diagnosis.
+*   Respiratory support_D2_1 = oxygen therapy.
+*   Respiratory support_D2_2 = non-invasive ventilation.
+*   Respiratory support_D2_3 = invasive mechanical ventilation.
+*   Predisposing factors for ARDS_1 = pneumonia.
+*   Predisposing factors for ARDS_0 = other factors.
+*   Chronic lung disease_1 = with Chronic lung disease.
+*   Chronic lung disease_0 = without Chronic lung disease.
+"""
+st.markdown(disclaimer_text)
 
 
 

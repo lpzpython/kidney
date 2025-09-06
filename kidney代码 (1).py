@@ -147,8 +147,7 @@ if st.button("Train Model and Predict"):
 st.markdown("---") # Horizontal line separator
 disclaimer_text = """
 **Disclaimer:**
-
-*   Supplement:
+Supplement:
 *   D1 and D2 represent the first day and the second day after ARDS diagnosis, respectively.
 *   APACHE II and FIO₂ were recorded on the first day after ARDS diagnosis.
 *   Change of white blood cell count was calculated as the difference between the count on D2 and D1.

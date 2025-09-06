@@ -1,9 +1,3 @@
-#!/usr/bin/env python
-# coding: utf-8
-
-# In[1]:
-
-
 import streamlit as st
 import pandas as pd
 import numpy as np
@@ -13,6 +7,9 @@ from sklearn.compose import ColumnTransformer
 from sklearn.pipeline import Pipeline
 from sklearn.svm import SVC
 from sklearn.model_selection import train_test_split
+
+# --- Set wide layout ---
+st.set_page_config(layout="wide")
 
 # --- Your Provided Code (Adapted for Streamlit) ---
 
@@ -30,6 +27,8 @@ continuous_vars = [
 categorical_vars = [
     'Predisposing factors for ARDS', 'Chronic lung disease', 'Respiratory support_D2'
 ]
+# Combine all variables for unified input
+all_vars = continuous_vars + categorical_vars
 
 # Preprocessing pipeline
 preprocessor = ColumnTransformer(
@@ -65,48 +64,46 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_
 
 st.title("Acute Kidney Failure Prediction")
 
-# --- 1. User Input for X values ---
+# --- 1. User Input for X values (Unified, 4 columns) ---
 st.header("1. Enter Patient Data")
 
 user_input = {}
 
-st.subheader("Continuous Variables")
-# Create input fields for continuous variables
-cont_cols = st.columns(2)
-for i, var in enumerate(continuous_vars):
-    with cont_cols[i % 2]:
-        # Default value could be mean or median from training data, here using 0.0 for simplicity
-        default_val = X[var].mean() if var in X.columns else 0.0
-        user_input[var] = st.number_input(f"{var}", value=float(default_val), format="%.4f", step=0.1)
+# Create input fields for all variables in 4 columns
+# Combine continuous and categorical for unified handling in layout
+input_cols = st.columns(4) # Changed to 4 columns
+for i, var in enumerate(all_vars):
+    with input_cols[i % 4]: # Cycle through 4 columns
+        if var in continuous_vars:
+            # Handle continuous variables
+            default_val = X[var].mean() if var in X.columns else 0.0
+            user_input[var] = st.number_input(f"{var}", value=float(default_val), format="%.4f", step=0.1)
+        else: # Handle categorical variables
+            # Get categories for categorical variables
+            fitted_encoder = preprocessor.named_transformers_['cat']
+            try:
+                # Find the index of the categorical variable in the transformer's input list
+                cat_var_index = categorical_vars.index(var)
+                options = fitted_encoder.categories_[cat_var_index]
+            except (AttributeError, ValueError, IndexError):
+                # Fallback if categories_ is not directly available or index error
+                options = np.unique(df[var].astype(str))
+            # Default to the first category or a placeholder
+            default_option = options[0] if len(options) > 0 else 'Unknown'
+            user_input[var] = st.selectbox(f"{var}", options=options, index=0)
 
-st.subheader("Categorical Variables")
-# Create input fields for categorical variables
-# We need to know the categories from the training data's encoder
-fitted_encoder = preprocessor.named_transformers_['cat']
-try:
-    categories = fitted_encoder.categories_
-except AttributeError:
-    # Fallback if categories_ is not directly available
-    categories = [np.unique(df[col].astype(str)) for col in categorical_vars]
-
-cat_options_dict = dict(zip(categorical_vars, categories))
-
-for var in categorical_vars:
-    options = cat_options_dict.get(var, ['Unknown'])
-    # Default to the first category or a placeholder
-    default_option = options[0] if len(options) > 0 else 'Unknown'
-    user_input[var] = st.selectbox(f"{var}", options=options, index=0)
-
-# --- 2. Model Parameter Adjustment (for Training) ---
+# --- 2. Model Parameter Adjustment (Moved below X input, no sidebar) ---
 st.header("2. Set Model Parameters for Training")
 
-# Using sidebar for parameters
-with st.sidebar:
-    st.subheader("SVM Parameters")
-    # Default parameters matching your original code snippet
+# Create columns for parameters to keep them organized
+param_cols = st.columns(3)
+with param_cols[0]:
     selected_kernel = st.selectbox("Kernel", options=['linear', 'rbf', 'poly'], index=0) # Default 'linear'
+with param_cols[1]:
     selected_C = st.slider("Regularization Parameter (C)", min_value=0.01, max_value=10.0, value=1.0, step=0.01) # Default 1.0
+with param_cols[2]:
     selected_class_weight = st.selectbox("Class Weight", options=[None, 'balanced'], index=1) # Default 'balanced'
+
 
 # --- 3. Prediction Button and Logic ---
 if st.button("Train Model and Predict"):
@@ -139,7 +136,25 @@ if st.button("Train Model and Predict"):
         st.header("Prediction Result")
         # st.write(f"**Predicted Class:** {prediction}")
         st.metric(label="Predicted Probability of Acute Kidney Failure", value=f"{prediction_proba[1]:.4f}")
+        st.metric(label="Predicted Probability of No Acute Kidney Failure", value=f"{prediction_proba[0]:.4f}")
+
+        # Simple visualization
+        import matplotlib.pyplot as plt
+        fig, ax = plt.subplots()
+        classes = ['No Failure', 'Failure']
+        probs = [prediction_proba[0], prediction_proba[1]]
+        bars = ax.bar(classes, probs, color=['blue', 'red'])
+        ax.set_ylabel('Probability')
+        ax.set_title('Prediction Probabilities')
+        # Add value labels on bars
+        for bar, prob in zip(bars, probs):
+            yval = bar.get_height()
+            ax.text(bar.get_x() + bar.get_width()/2.0, yval + 0.01, f'{prob:.4f}', ha='center', va='bottom')
+        st.pyplot(fig)
 
     except Exception as e:
         st.error(f"An error occurred during model training or prediction: {e}")
+
+
+
 

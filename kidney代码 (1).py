@@ -148,7 +148,8 @@ st.markdown("---") # Horizontal line separator
 disclaimer_text = """
 **Disclaimer:**
 
-*   **Supplement:** D1 and D2 represent the first day and the second day after ARDS diagnosis, respectively.
+*   Supplement:
+*   D1 and D2 represent the first day and the second day after ARDS diagnosis, respectively.
 *   APACHE II and FIO₂ were recorded on the first day after ARDS diagnosis.
 *   Change of white blood cell count was calculated as the difference between the count on D2 and D1.
 *   48-hour fluid balance represents the total intake and output volume during the 2 days after ARDS diagnosis.

@@ -21,12 +21,14 @@ except FileNotFoundError:
     st.error("Error, file not found")
     st.stop()
 
+df.rename(columns={"入选时FiO2":"FiO2","APACHE Ⅱ score_at the time of inclusion":"APACHE II"},inplace=True)
+
 # Define variables
 continuous_vars = [
-    '入选时FiO2', 'Lym_D1', 'Hb(g/L)_D2', 'BUN(mmolL)_D2', 'Cl(mmolL)_D1',
+    'FiO2', 'Lym_D1', 'Hb(g/L)_D2', 'BUN(mmolL)_D2', 'Cl(mmolL)_D1',
     'PT(s)_D2', 'PTA(%)_D2', 'Fib(gL)_D2', 'PO2/FiO2(mmHg)_D2', 'HCO3_D2',
     'Change of white blood cell count', '48-hour fluid balance',
-    'APACHE Ⅱ score_at the time of inclusion', 'CTnI(ngml)_D2', 'BUN(mmolL)_D1',
+    'APACHE II', 'CTnI(ngml)_D2', 'BUN(mmolL)_D1',
     'DBIL(μmolL)_D2'
 ]
 categorical_vars = [
@@ -83,7 +85,10 @@ for i, var in enumerate(all_vars):
     with input_cols[i % 4]: # Cycle through 4 columns
         if var in continuous_vars:
             # Handle continuous variables - No default value
-            user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="please enter")
+            if var =="FiO2":
+                user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="please enter,e.g.,0.6")
+            else:
+                user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="please enter")
             if user_val is None:
                 input_valid = False
                 #st.warning(f"请输入 {var} 的值")

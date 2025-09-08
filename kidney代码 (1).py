@@ -86,7 +86,7 @@ for i, var in enumerate(all_vars):
             user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="请输入数值")
             if user_val is None:
                 input_valid = False
-                st.warning(f"请输入 {var} 的值")
+                #st.warning(f"请输入 {var} 的值")
             user_input[var] = user_val
         else: # Handle categorical variables
             # Get categories for categorical variables
@@ -103,7 +103,7 @@ for i, var in enumerate(all_vars):
             selected_option = st.selectbox(f"{var}", options=options, index=None, placeholder="请选择")
             if selected_option is None:
                 input_valid = False
-                st.warning(f"请选择 {var} 的值")
+                #st.warning(f"请选择 {var} 的值")
             user_input[var] = selected_option
 
 # --- 2. Model Parameter Display (Fixed, no user selection) ---

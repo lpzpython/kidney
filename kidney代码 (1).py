@@ -101,11 +101,11 @@ st.header("2. Set Model Parameters for Training")
 # Create columns for parameters to keep them organized
 param_cols = st.columns(3)
 with param_cols[0]:
-    selected_kernel = st.selectbox("Kernel", options=['linear', 'rbf', 'poly'], index=0) # Default 'linear'
+    selected_kernel = st.selectbox("Kernel", options=['linear'], index=0) # Default 'linear'
 with param_cols[1]:
-    selected_C = st.slider("Regularization Parameter (C)", min_value=0.01, max_value=10.0, value=1.0, step=0.01) # Default 1.0
+    selected_C = st.slider("Regularization Parameter (C)", min_value=2, max_value=2, value=1.0, step=1) # Default 1.0
 with param_cols[2]:
-    selected_class_weight = st.selectbox("Class Weight", options=[None, 'balanced'], index=1) # Default 'balanced'
+    selected_class_weight = st.selectbox("Class Weight", options=['balanced'], index=1) # Default 'balanced'
 
 
 # --- 3. Prediction Button and Logic ---

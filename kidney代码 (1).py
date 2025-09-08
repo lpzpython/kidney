@@ -156,7 +156,7 @@ if st.button("Train Model and Predict"):
             st.header("Prediction Result")
             # Assuming class 1 is 'Acute Kidney Injury'
             prob_label = "Predicted Probability of Acute Kidney Injury"
-            st.metric(label=prob_label, value=f"{prediction_proba[1]:.4f}") # Displaying probability of class 1
+            st.metric(label=prob_label, value=f"{prediction_proba[1]*100:.2f}%") # Displaying probability of class 1
 
         except Exception as e:
             st.error(f"An error occurred during model training or prediction: {e}")

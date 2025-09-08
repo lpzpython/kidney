@@ -18,7 +18,7 @@ st.set_page_config(layout="wide")
 try:
     df = pd.read_excel('5.19交集特征.xlsx')
 except FileNotFoundError:
-    st.error("错误: 找不到文件 '5.19交集特征.xlsx'。请确保文件存在于当前目录下。")
+    st.error("Error, file not found")
     st.stop()
 
 # Define variables
@@ -83,7 +83,7 @@ for i, var in enumerate(all_vars):
     with input_cols[i % 4]: # Cycle through 4 columns
         if var in continuous_vars:
             # Handle continuous variables - No default value
-            user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="请输入数值")
+            user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="please enter")
             if user_val is None:
                 input_valid = False
                 #st.warning(f"请输入 {var} 的值")
@@ -100,7 +100,7 @@ for i, var in enumerate(all_vars):
                 options = np.unique(df[var].astype(str))
             # Default to the first category or a placeholder
             # UI - No default selection, user must choose
-            selected_option = st.selectbox(f"{var}", options=options, index=None, placeholder="请选择")
+            selected_option = st.selectbox(f"{var}", options=options, index=None, placeholder="please enter")
             if selected_option is None:
                 input_valid = False
                 #st.warning(f"请选择 {var} 的值")
@@ -126,7 +126,7 @@ with col3:
 # --- 3. Prediction Button and Logic ---
 if st.button("Train Model and Predict"):
     if not input_valid:
-        st.error("预测失败：请检查并完整输入所有 X 值。")
+        st.error("error, please check all X is inputed")
     else:
         # Create a DataFrame from user input
         input_data = pd.DataFrame([user_input])

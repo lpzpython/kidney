@@ -150,7 +150,7 @@ if st.button("Train Model and Predict"):
 
             # Make prediction using the newly trained model
             # Prediction probabilities
-            prediction_proba = svc.predict_proba(input_processed)[0]
+            prediction_proba = svc.predict_proba(input_processed)
             
             # Display results
             st.header("Prediction Result")

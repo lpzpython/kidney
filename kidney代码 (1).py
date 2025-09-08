@@ -112,7 +112,7 @@ st.header("2. Model Parameters (Fixed)")
 # Display fixed parameters
 # Store fixed parameters
 FIXED_KERNEL = 'linear'
-FIXED_C = '1.0'
+FIXED_C = 1.0
 FIXED_CLASS_WEIGHT = 'balanced'
 
 col1, col2, col3 = st.columns(3)

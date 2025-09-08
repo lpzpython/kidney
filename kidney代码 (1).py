@@ -1,7 +1,6 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
-import numpy as np
 from scipy import stats
 from sklearn.preprocessing import StandardScaler, OneHotEncoder
 from sklearn.compose import ColumnTransformer
@@ -16,7 +15,11 @@ st.set_page_config(layout="wide")
 
 # Load data
 # Note: Ensure '5.19交集特征.xlsx' is in the same directory or provide the full path
-df = pd.read_excel('5.19交集特征.xlsx') 
+try:
+    df = pd.read_excel('5.19交集特征.xlsx')
+except FileNotFoundError:
+    st.error("错误: 找不到文件 '5.19交集特征.xlsx'。请确保文件存在于当前目录下。")
+    st.stop()
 
 # Define variables
 continuous_vars = [
@@ -71,6 +74,7 @@ st.markdown("<h1 style='text-align: center;'>Support Vector Machine model for pr
 st.header("1. Enter Patient Data")
 
 user_input = {} # summarize user input data
+input_valid = True # Flag to check if all inputs are valid
 
 # Create input fields for all variables in 4 columns
 # Combine continuous and categorical for unified handling in layout
@@ -78,9 +82,12 @@ input_cols = st.columns(4) # Changed to 4 columns
 for i, var in enumerate(all_vars):
     with input_cols[i % 4]: # Cycle through 4 columns
         if var in continuous_vars:
-            # Handle continuous variables
-            default_val = X[var].mean() if var in X.columns else 0.0
-            user_input[var] = st.number_input(f"{var}", value=float(default_val), format="%.4f", step=0.1)
+            # Handle continuous variables - No default value
+            user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="请输入数值")
+            if user_val is None:
+                input_valid = False
+                st.warning(f"请输入 {var} 的值")
+            user_input[var] = user_val
         else: # Handle categorical variables
             # Get categories for categorical variables
             fitted_encoder = preprocessor.named_transformers_['cat']
@@ -92,57 +99,67 @@ for i, var in enumerate(all_vars):
                 # Fallback if categories_ is not directly available or index error
                 options = np.unique(df[var].astype(str))
             # Default to the first category or a placeholder
-            #UI
-            default_option = options[0] if len(options) > 0 else 'Unknown'
-            user_input[var] = st.selectbox(f"{var}", options=options, index=0)
+            # UI - No default selection, user must choose
+            selected_option = st.selectbox(f"{var}", options=options, index=None, placeholder="请选择")
+            if selected_option is None:
+                input_valid = False
+                st.warning(f"请选择 {var} 的值")
+            user_input[var] = selected_option
 
-# --- 2. Model Parameter Adjustment (Moved below X input, no sidebar) ---
-st.header("2. Model Parameters for Training")
+# --- 2. Model Parameter Display (Fixed, no user selection) ---
+st.header("2. Model Parameters (Fixed)")
 
-# Create columns for parameters to keep them organized
-param_cols = st.columns(3)
-with param_cols[0]:
-    selected_kernel = st.selectbox("Kernel", options=['linear'], index=0) # Default 'linear'
-with param_cols[1]:
-    selected_C = st.slider("Regularization Parameter (C)", min_value=1, max_value=10, value=1, step=0.01) # Default 1.0
-with param_cols[2]:
-    selected_class_weight = st.selectbox("Class Weight", options=['balanced'], index=1) # Default 'balanced'
+# Display fixed parameters
+# Store fixed parameters
+FIXED_KERNEL = 'linear'
+FIXED_C = '1.0'
+FIXED_CLASS_WEIGHT = 'balanced'
 
+col1, col2, col3 = st.columns(3)
+with col1:
+    st.metric(label="Kernel", value=FIXED_KERNEL)
+with col2:
+    st.metric(label="Regularization Parameter (C)", value=FIXED_C )
+with col3:
+    st.metric(label="Class Weight", value=FIXED_CLASS_WEIGHT)
 
 # --- 3. Prediction Button and Logic ---
 if st.button("Train Model and Predict"):
-    # Create a DataFrame from user input
-    input_data = pd.DataFrame([user_input])
+    if not input_valid:
+        st.error("预测失败：请检查并完整输入所有 X 值。")
+    else:
+        # Create a DataFrame from user input
+        input_data = pd.DataFrame([user_input])
 
-    # --- Train the model with selected parameters ---
-    try:
-        # Use the train/test split defined earlier
-        #model
-        svc = SVC(
-            kernel=selected_kernel,
-            C=selected_C,
-            class_weight=selected_class_weight,
-            probability=True, # Required for predict_proba
-            random_state=999
-        )
-        svc.fit(X_train, y_train) # Train on the training set
-        st.success("Model trained successfully with selected parameters!")
+        # --- Train the model with fixed parameters ---
+        try:
+            # Use the train/test split defined earlier
+            # model
+            svc = SVC(
+                kernel=FIXED_KERNEL,
+                C=FIXED_C,
+                class_weight=FIXED_CLASS_WEIGHT,
+                probability=True, # Required for predict_proba
+                random_state=999
+            )
+            svc.fit(X_train, y_train) # Train on the training set
+            st.success("Model trained successfully with fixed parameters!")
 
-        # Apply the same preprocessing pipeline to input data
-        input_processed = preprocessor.transform(input_data)
+            # Apply the same preprocessing pipeline to input data
+            input_processed = preprocessor.transform(input_data)
 
-        # Make prediction using the newly trained model
-        # Predicted class
-        # prediction = svc.predict(input_processed)[0]
-        # Prediction probabilities
-        prediction_proba = svc.predict_proba(input_processed)[0]
-        #svc.predict_proba(input_processed)
-        # Display results
-        st.header("Prediction Result")
-        st.metric(label="Predicted Probability of Acute Kidney Injury", value=f"{prediction_proba[0]:.2f}")
+            # Make prediction using the newly trained model
+            # Prediction probabilities
+            prediction_proba = svc.predict_proba(input_processed)[0]
+            
+            # Display results
+            st.header("Prediction Result")
+            # Assuming class 1 is 'Acute Kidney Injury'
+            prob_label = "Predicted Probability of Acute Kidney Injury"
+            st.metric(label=prob_label, value=f"{prediction_proba[1]:.4f}") # Displaying probability of class 1
 
-    except Exception as e:
-        st.error(f"An error occurred during model training or prediction: {e}")
+        except Exception as e:
+            st.error(f"An error occurred during model training or prediction: {e}")
 
 
 # --- Disclaimer Section at the Bottom ---

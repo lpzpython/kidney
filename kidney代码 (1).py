@@ -103,7 +103,7 @@ param_cols = st.columns(3)
 with param_cols[0]:
     selected_kernel = st.selectbox("Kernel", options=['linear'], index=0) # Default 'linear'
 with param_cols[1]:
-    selected_C = st.slider("Regularization Parameter (C)", min_value=2, max_value=2, value=2, step=1) # Default 1.0
+    selected_C = st.slider("Regularization Parameter (C)", min_value=1, max_value=10, value=1, step=0.01) # Default 1.0
 with param_cols[2]:
     selected_class_weight = st.selectbox("Class Weight", options=['balanced'], index=1) # Default 'balanced'
 

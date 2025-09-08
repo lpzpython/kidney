@@ -70,7 +70,7 @@ st.markdown("<h1 style='text-align: center;'>Support Vector Machine model for pr
 # --- 1. User Input for X values (Unified, 4 columns) ---
 st.header("1. Enter Patient Data")
 
-user_input = {}
+user_input = {} # summarize user input data
 
 # Create input fields for all variables in 4 columns
 # Combine continuous and categorical for unified handling in layout
@@ -92,11 +92,12 @@ for i, var in enumerate(all_vars):
                 # Fallback if categories_ is not directly available or index error
                 options = np.unique(df[var].astype(str))
             # Default to the first category or a placeholder
+            #UI
             default_option = options[0] if len(options) > 0 else 'Unknown'
             user_input[var] = st.selectbox(f"{var}", options=options, index=0)
 
 # --- 2. Model Parameter Adjustment (Moved below X input, no sidebar) ---
-st.header("2. Set Model Parameters for Training")
+st.header("2. Model Parameters for Training")
 
 # Create columns for parameters to keep them organized
 param_cols = st.columns(3)
@@ -116,6 +117,7 @@ if st.button("Train Model and Predict"):
     # --- Train the model with selected parameters ---
     try:
         # Use the train/test split defined earlier
+        #model
         svc = SVC(
             kernel=selected_kernel,
             C=selected_C,
@@ -131,14 +133,13 @@ if st.button("Train Model and Predict"):
 
         # Make prediction using the newly trained model
         # Predicted class
-        prediction = svc.predict(input_processed)[0]
+        # prediction = svc.predict(input_processed)[0]
         # Prediction probabilities
         prediction_proba = svc.predict_proba(input_processed)[0]
-
+        #svc.predict_proba(input_processed)
         # Display results
         st.header("Prediction Result")
-        # st.write(f"**Predicted Class:** {prediction}")
-        st.metric(label="Predicted Probability of Acute Kidney Failure", value=f"{prediction_proba[1]:.4f}")
+        st.metric(label="Predicted Probability of Acute Kidney Injury", value=f"{prediction_proba[0]:.2f}")
 
     except Exception as e:
         st.error(f"An error occurred during model training or prediction: {e}")

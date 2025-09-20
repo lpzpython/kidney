@@ -88,7 +88,16 @@ st.header("1. Enter Patient Data")
 
 user_input = {} # summarize user input data
 input_valid = True # Flag to check if all inputs are valid
-
+#新增0920
+# 确定最小值。假设生理参数非负。
+min_val = 0.0 
+# 定义一个合理的默认值
+default_val = 0.0
+def make_callback(var_name):
+    def callback():
+        st.session_state[f"user_set_{var_name}"] = True
+    return callback
+#新增结束0920
 # Create input fields for all variables in 4 columns
 # Combine continuous and categorical for unified handling in layout
 input_cols = st.columns(4) # Changed to 4 columns
@@ -97,7 +106,7 @@ for i, var in enumerate(all_vars):
         if var in continuous_vars:
             # Handle continuous variables - No default value
             if var =="FiO2":
-                user_val = st.number_input(f"{var}", min_value=0.001,value=np.nan,format="%.4f", step=0.01, placeholder="please enter,e.g.,0.6")
+                user_val = st.number_input(f"{var}", min_value=min_val,value=default_val,format="%.4f", step=0.01, placeholder="please enter,e.g.,0.6",on_change=make_callback(var))
             else:
                 user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.01, placeholder="please enter")
             if user_val is None:

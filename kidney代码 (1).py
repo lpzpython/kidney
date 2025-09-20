@@ -21,15 +21,26 @@ except FileNotFoundError:
     st.error("Error, file not found")
     st.stop()
 
-df.rename(columns={"入选时FiO2":"FiO2","APACHE Ⅱ score_at the time of inclusion":"APACHE II"},inplace=True)
+df.rename(columns={"入选时FiO2":"FiO2",
+                   "APACHE Ⅱ score_at the time of inclusion":"APACHE II",
+                  "Lym_D1":"Lym(*10^9/L)_D1",
+                  "BUN(mmolL)_D2":"BUN(mmol/L)_D2",
+                  "Cl(mmolL)_D1":"Cl(mmol/L)_D1",
+                  "Fib(gL)_D2":"Fib(g/L)_D2",
+                  "HCO3_D2":"HCO3(mmol/L)_D2",
+                  "Change of white blood cell count":"Change of white blood cell count(*10^9/L)",
+                  "48-hour fluid balance":"48-hour fluid balnce(ml)",
+                  "CTnI(ngml)_D2":"CTnl(ng/ml)_D2",
+                  "BUN(mmolL)_D1":"BUN(mmol/L)_D1",
+                  "DBIL(μmolL)_D2":"DBIL(μmol/L)D2"},inplace=True)
 
 # Define variables
 continuous_vars = [
-    'FiO2', 'Lym_D1', 'Hb(g/L)_D2', 'BUN(mmolL)_D2', 'Cl(mmolL)_D1',
-    'PT(s)_D2', 'PTA(%)_D2', 'Fib(gL)_D2', 'PO2/FiO2(mmHg)_D2', 'HCO3_D2',
-    'Change of white blood cell count', '48-hour fluid balance',
-    'APACHE II', 'CTnI(ngml)_D2', 'BUN(mmolL)_D1',
-    'DBIL(μmolL)_D2'
+    'FiO2', 'Lym(*10^9/L)_D1', 'Hb(g/L)_D2', 'BUN(mmol/L)_D2', 'Cl(mmol/L)_D1',
+    'PT(s)_D2', 'PTA(%)_D2', 'Fib(g/L)_D2', 'PO2/FiO2(mmHg)_D2', 'HCO3(mmol/L)_D2',
+    'Change of white blood cell count(*10^9/L)', '48-hour fluid balnce(ml)',
+    'APACHE II', 'CTnl(ng/ml)_D2', 'BUN(mmol/L)_D1',
+    'DBIL(μmol/L)D2'
 ]
 categorical_vars = [
     'Predisposing factors for ARDS', 'Chronic lung disease', 'Respiratory support_D2'
@@ -86,9 +97,9 @@ for i, var in enumerate(all_vars):
         if var in continuous_vars:
             # Handle continuous variables - No default value
             if var =="FiO2":
-                user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="please enter,e.g.,0.6")
+                user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.01, placeholder="please enter,e.g.,0.6")
             else:
-                user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.1, placeholder="please enter")
+                user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.01, placeholder="please enter")
             if user_val is None:
                 input_valid = False
                 #st.warning(f"请输入 {var} 的值")

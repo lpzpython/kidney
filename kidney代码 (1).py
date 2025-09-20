@@ -97,7 +97,7 @@ for i, var in enumerate(all_vars):
         if var in continuous_vars:
             # Handle continuous variables - No default value
             if var =="FiO2":
-                user_val = st.number_input(f"{var}", value=None,format="%.4f", step=0.01, placeholder="please enter,e.g.,0.6")
+                user_val = st.number_input(f"{var}", min_value=0.001,value=np.nan,format="%.4f", step=0.01, placeholder="please enter,e.g.,0.6")
             else:
                 user_val = st.number_input(f"{var}", value=None, format="%.4f", step=0.01, placeholder="please enter")
             if user_val is None:
